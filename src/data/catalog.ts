@@ -20,9 +20,9 @@ export const STARTER_STICKERS: PlacedSticker[] = [
   { id: 'starter-poster', kind: 'poster', x: 58, y: 78 },
   { id: 'starter-lamp', kind: 'lamp', x: 86, y: 148 },
   { id: 'starter-cat', kind: 'cat', x: 108, y: 188 },
-  { id: 'starter-books', kind: 'books', x: 228, y: 198 },
-  { id: 'starter-mug', kind: 'mug', x: 176, y: 228 },
-  { id: 'starter-vinyl', kind: 'vinyl', x: 248, y: 248 },
+  { id: 'starter-books', kind: 'books', x: 206, y: 186 },
+  { id: 'starter-mug', kind: 'mug', x: 168, y: 222 },
+  { id: 'starter-vinyl', kind: 'vinyl', x: 196, y: 232 },
 ];
 
 export const STICKER_SIZE = 64;

@@ -9,7 +9,7 @@ type ArtProps = { size?: number };
 
 function Board({ children, size = 64 }: { children: ReactNode } & ArtProps) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 64 64">
+    <Svg width={size} height={size} viewBox="0 0 64 64" pointerEvents="none">
       {children}
     </Svg>
   );

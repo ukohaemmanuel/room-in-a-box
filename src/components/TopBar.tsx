@@ -1,8 +1,12 @@
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors, shadow } from '../theme';
 
-export function TopBar() {
+type Props = {
+  onShare: () => void;
+};
+
+export function TopBar({ onShare }: Props) {
   return (
     <View style={styles.row}>
       <View>
@@ -12,9 +16,8 @@ export function TopBar() {
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Share room"
-        onPress={() =>
-          Alert.alert('Share', 'This sample keeps the diorama in your pocket — sharing is a no-op for now.')
-        }
+        testID="share-button"
+        onPress={onShare}
         style={({ pressed }) => [styles.share, pressed && styles.sharePressed]}
       >
         <Text style={styles.shareText}>Share</Text>

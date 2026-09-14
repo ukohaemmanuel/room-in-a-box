@@ -2,6 +2,10 @@
 
 A cozy isometric sticker dollhouse — a pocket-home diorama you can play with in Expo.
 
+## Screenshot
+
+![Room in a Box main screen](docs/screenshot.png)
+
 Open the app and you land on a warm clay/toy bedroom with a pre-decorated starter scene and a pastel sticker tray. Tap or drag stickers onto the room, then move them around. Long-press a placed sticker to peel it off.
 
 ## Run

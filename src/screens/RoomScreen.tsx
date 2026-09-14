@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -18,6 +18,7 @@ export function RoomScreen() {
   const insets = useSafeAreaInsets();
   const [stickers, setStickers] = useState<PlacedSticker[]>(STARTER_STICKERS);
   const [ghost, setGhost] = useState<Ghost | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
   const canvasRef = useRef<View>(null);
   const rootRef = useRef<View>(null);
   const tapCount = useRef(0);
@@ -31,8 +32,8 @@ export function RoomScreen() {
     (kind: StickerKind) => {
       const n = tapCount.current;
       tapCount.current += 1;
-      const x = 148 + (n % 4) * 18 - 8;
-      const y = 176 + Math.floor(n / 4) * 16;
+      const x = 132 + (n % 4) * 22;
+      const y = 204 + Math.floor(n / 4) * 18;
       placeSticker(kind, x, y);
     },
     [placeSticker],
@@ -92,6 +93,11 @@ export function RoomScreen() {
     setStickers((current) => current.filter((item) => item.id !== id));
   }, []);
 
+  const showShareToast = useCallback(() => {
+    setToast('Postcard packed — sharing is a sample no-op.');
+    setTimeout(() => setToast(null), 2200);
+  }, []);
+
   const selectSticker = useCallback((id: string) => {
     setStickers((current) => {
       const index = current.findIndex((item) => item.id === id);
@@ -109,9 +115,14 @@ export function RoomScreen() {
     <View ref={rootRef} style={styles.root}>
       <LinearGradient colors={[colors.peachWash, '#F8DCC6', '#EED3B4']} style={StyleSheet.absoluteFill} />
       <View style={[styles.body, { paddingTop: Math.max(insets.top, 12) }]}>
-        <TopBar />
+        <TopBar onShare={showShareToast} />
         <View style={styles.stage}>
-          <View ref={canvasRef} style={[styles.canvas, shadow.soft]} collapsable={false}>
+          <View
+            ref={canvasRef}
+            testID="room-canvas"
+            style={[styles.canvas, shadow.soft]}
+            collapsable={false}
+          >
             <IsometricRoom />
             {stickers.map((sticker) => (
               <DraggableSticker
@@ -137,6 +148,11 @@ export function RoomScreen() {
           onDragCancel={handleDragCancel}
         />
       </View>
+      {toast ? (
+        <Pressable testID="share-toast" onPress={() => setToast(null)} style={styles.toast}>
+          <Text style={styles.toastText}>{toast}</Text>
+        </Pressable>
+      ) : null}
       {ghost ? (
         <View pointerEvents="none" style={styles.ghostLayer}>
           <View
@@ -188,5 +204,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     top: 0,
+  },
+  toast: {
+    position: 'absolute',
+    top: 88,
+    alignSelf: 'center',
+    backgroundColor: colors.ink,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 999,
+    zIndex: 30,
+  },
+  toastText: {
+    color: colors.cream,
+    fontWeight: '700',
+    fontSize: 13,
   },
 });

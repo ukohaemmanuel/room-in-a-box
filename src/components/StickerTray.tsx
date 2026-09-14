@@ -1,4 +1,5 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useMemo, useRef } from 'react';
+import { PanResponder, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
 
@@ -55,27 +56,76 @@ function TrayChip({
     });
 
   const composed = Gesture.Exclusive(pan, tap);
+  const dragging = useRef(false);
+  const callbacks = useRef({ kind, onTap, onDragStart, onDragMove, onDragEnd, onDragCancel });
+  callbacks.current = { kind, onTap, onDragStart, onDragMove, onDragEnd, onDragCancel };
 
-  return (
-    <GestureDetector gesture={composed}>
-      <View collapsable={false} style={styles.chipWrap}>
+  const panResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => false,
+        onMoveShouldSetPanResponder: (_, gesture) =>
+          Math.abs(gesture.dy) > 10 && Math.abs(gesture.dy) > Math.abs(gesture.dx),
+        onPanResponderGrant: () => {
+          dragging.current = false;
+        },
+        onPanResponderMove: (event, gesture) => {
+          if (Math.abs(gesture.dx) > 8 || Math.abs(gesture.dy) > 8) {
+            if (!dragging.current) {
+              dragging.current = true;
+              callbacks.current.onDragStart(
+                callbacks.current.kind,
+                event.nativeEvent.pageX,
+                event.nativeEvent.pageY,
+              );
+            }
+            callbacks.current.onDragMove(event.nativeEvent.pageX, event.nativeEvent.pageY);
+          }
+        },
+        onPanResponderRelease: (event) => {
+          if (dragging.current) {
+            callbacks.current.onDragEnd(event.nativeEvent.pageX, event.nativeEvent.pageY);
+          }
+          callbacks.current.onDragCancel();
+          dragging.current = false;
+        },
+        onPanResponderTerminate: () => {
+          callbacks.current.onDragCancel();
+        },
+      }),
+    [],
+  );
+
+  const chip = (
+    <View
+      collapsable={false}
+      testID={`tray-${kind}`}
+      {...(Platform.OS === 'web' ? panResponder.panHandlers : {})}
+      // @ts-expect-error touchAction is used on web
+      style={[styles.chipWrap, Platform.OS === 'web' ? { touchAction: 'none' } : null]}
+    >
+      <Pressable disabled={Platform.OS !== 'web'} onPress={() => onTap(kind)}>
         <View style={[styles.chip, { backgroundColor: trayBg }]}>
           <StickerArt kind={kind} size={TRAY_STICKER_SIZE} />
         </View>
         <Text style={styles.chipLabel}>{label}</Text>
-      </View>
-    </GestureDetector>
+      </Pressable>
+    </View>
   );
+
+  if (Platform.OS === 'web') {
+    return chip;
+  }
+
+  return <GestureDetector gesture={composed}>{chip}</GestureDetector>;
 }
 
 export function StickerTray({ onTap, onDragStart, onDragMove, onDragEnd, onDragCancel }: Props) {
   return (
     <View style={styles.tray}>
       <View style={styles.handle} />
-      <View style={styles.headerRow}>
-        <Text style={styles.title}>Sticker tray</Text>
-        <Text style={styles.hint}>tap or drag · hold to peel off</Text>
-      </View>
+      <Text style={styles.title}>Sticker tray</Text>
+      <Text style={styles.hint}>tap or drag onto the room · hold a sticker to peel it off</Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -116,24 +166,21 @@ const styles = StyleSheet.create({
     height: 5,
     borderRadius: 99,
     backgroundColor: '#E8C9B0',
-    marginBottom: 8,
-  },
-  headerRow: {
-    paddingHorizontal: 20,
     marginBottom: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
   },
   title: {
     fontSize: 16,
     fontWeight: '800',
     color: colors.ink,
     letterSpacing: 0.2,
+    paddingHorizontal: 20,
   },
   hint: {
     fontSize: 11,
     color: colors.inkSoft,
+    paddingHorizontal: 20,
+    marginTop: 2,
+    marginBottom: 12,
   },
   row: {
     paddingHorizontal: 16,
@@ -151,6 +198,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 1.5,
     borderColor: 'rgba(255,255,255,0.85)',
+    ...shadow.sticker,
   },
   chipLabel: {
     marginTop: 6,

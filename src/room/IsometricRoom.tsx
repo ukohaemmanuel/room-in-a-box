@@ -120,7 +120,7 @@ export function IsometricRoom() {
   const lantern = iso(0.12, 0.12, 0.82);
 
   return (
-    <Svg width="100%" height="100%" viewBox={`0 0 ${ROOM_VB.w} ${ROOM_VB.h}`}>
+    <Svg width="100%" height="100%" viewBox={`0 0 ${ROOM_VB.w} ${ROOM_VB.h}`} pointerEvents="none">
       <Defs>
         <LinearGradient id="leftWall" x1="0" y1="0" x2="1" y2="1">
           <Stop offset="0" stopColor="#FFF7EC" />
