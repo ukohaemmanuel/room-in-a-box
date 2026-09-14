@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "Room in a Box",
+    "slug": "room-in-a-box",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "room-in-a-box",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F6E4CF"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.roominabox.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#F6E4CF",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "backgroundColor": "#EED6BC"
+    }
+  }
+}
